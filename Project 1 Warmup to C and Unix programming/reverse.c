@@ -79,6 +79,7 @@ int main(int argc, char *argv[]){
     FILE* fpOut;
     char input[200];
     char output[200];
+    
     //ei argumentteja
     if(argc == 1){
         fpIn = stdin;
@@ -101,10 +102,13 @@ int main(int argc, char *argv[]){
         strcpy(output, argv[2]);
         fpIn = fopen(input, "r");
         fpOut = fopen(output, "w");
-        
+        //Annetut tiedostot ovat samat
+        if(strcmp(argv[1], argv[2]) == 0){
+            fprintf(stderr, "Input and output file must differ\n");
+    }
     }
     else{
-        printf("usage: reverse <input> <output>\n");
+        fprintf(stderr, "usage: reverse <input> <output>\n");
         exit(1);
     }
    
