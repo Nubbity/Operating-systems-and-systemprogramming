@@ -11,17 +11,16 @@
 #include <string.h>
 
 void fileToStdout(char filename[300]){
-    FILE* fp = fopen(filename, "r");
-    if(!fp){printf("my-cat: cannot open file\n"); exit(1);}
-    while(1){//Luetaan kunnes EOF
-        char * line = malloc(100);
-        if(!line){exit(0);}
-        long int buf = 0;
-        if(getline(&line, &buf, fp) == -1){break;}
-        else{fprintf(stdout, "%s", line);}
-        free(line);
+    FILE* fp = fopen(filename, "r");//Tiedoston avaaminen
+    if(!fp){printf("my-cat: cannot open file\n"); exit(1);}//Jos tiedostoa ei löydy/ei voi avata
+    char * line = NULL;
+    size_t buf = 0;
+    while(getline(&line, &buf, fp) >=0){//Luetaan kunnes EOF
+        fprintf(stdout, "%s", line);//tulostetaan konsoliin
     }
-
+    fclose(fp);
+    free(line);
+    fprintf(stdout, "\n");//erotetaan luetut tiedostot toisistaan
 }
 
 int main(int argc, char *argv[]){
