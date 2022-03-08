@@ -2,7 +2,7 @@
     Käyttöjärjestelmät ja systeemiohjelmointi 2022
     Santeri Hynninen
     0565519
-    Project 2: Unix Utilities:UNZIP
+    Project 2: Unix Utilities:ZIP
     22.2.2022
 */
 
