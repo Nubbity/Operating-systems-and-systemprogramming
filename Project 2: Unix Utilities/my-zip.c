@@ -22,9 +22,7 @@ void zipFile(FILE * fpIn, FILE * fpOut){
         }
         else{
            fwrite(&n, sizeof(int),1, fpOut);
-           fprintf(stdout,"%d", n);
            fwrite(&last,sizeof(char),1, fpOut);
-           fprintf(stdout,"%c", last);
            n = 1;
         }
         last = current;
@@ -37,7 +35,7 @@ int main(int argc, char *argv[]){
     if(argc == 1){fprintf(stderr, "my-zip: file1 [file2 ...]\n");exit(1);}
     else if (argc == 2)
     {
-        zipFile(stdin, fopen(argv[1], "w"));
+        zipFile(stdin, fopen(argv[1], "a"));
     }
     else{
     //käydään kaikki tiedostot läpi

@@ -13,16 +13,15 @@
 
 void unzipFile(FILE * fpIn, FILE * fpOut){
     int lenght = 0;
-    char last;
+    char last = (char) 0;
     if(!fpIn || !fpOut){printf("my-grep: cannot open file\n"); exit(1);}
-    printf("Lezt go\n");
     while (1)
     {
         if(1 != fread(&lenght, sizeof(int), 1, fpIn)){break;}//Read number
         if(1 != fread(&last, sizeof(char), 1, fpIn)){break;}//Read char
 
         for (;lenght > 0; lenght--){
-            fprintf(stdin, "%c", last);
+            fprintf(fpOut, "%c", last);
             }
         lenght = 0;
        
@@ -32,10 +31,10 @@ void unzipFile(FILE * fpIn, FILE * fpOut){
     
 }
 int main(int argc, char *argv[]){
-    if(argc == 1){fprintf(stderr, "my-unzip: file1(Input) [file2(Output)]\n");exit(1);}
+    if(argc == 1){fprintf(stderr, "my-unzip: file1 [file2 ...]\n");exit(1);}
     else if (argc == 2)
     {
-        unzipFile(fopen(argv[1], "r"), stdin);
+        unzipFile(fopen(argv[1], "r"), stdout);
     }
     else if (argc == 3){
         unzipFile(fopen(argv[1], "r"), fopen(argv[2], "w"));
