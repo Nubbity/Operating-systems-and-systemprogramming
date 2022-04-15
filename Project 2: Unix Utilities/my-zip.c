@@ -11,8 +11,8 @@
 #include <string.h>
 
 void zipFile(FILE * fpIn, FILE * fpOut){
-    int current;
-    int last;
+    char current = (char)0;
+    char last = (char)0;
     int n = 1;
 
     while ((current = fgetc(fpIn))!= EOF)

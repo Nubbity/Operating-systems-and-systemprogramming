@@ -12,17 +12,20 @@
 #include <string.h>
 
 void unzipFile(FILE * fpIn, FILE * fpOut){
-    int lenght = 0;
+    int lenght = -1;
     char last = (char) 0;
     if(!fpIn || !fpOut){printf("my-grep: cannot open file\n"); exit(1);}
     while (1)
-    {
+    {   
+        
         if(1 != fread(&lenght, sizeof(int), 1, fpIn)){break;}//Read number
         if(1 != fread(&last, sizeof(char), 1, fpIn)){break;}//Read char
 
-        for (;lenght > 0; lenght--){
+            for (;lenght > 0; lenght--){
             fprintf(fpOut, "%c", last);
             }
+        
+       
         lenght = 0;
        
     }
