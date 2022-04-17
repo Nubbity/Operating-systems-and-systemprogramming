@@ -13,6 +13,13 @@
 #include<sys/wait.h>
 #include <unistd.h>
 #include <limits.h>
+#define PATH "/bin"
+
+#define ERROR_ACCESS "Could not access the command.\n"
+#define ERROR_EXIT "not able to use given arguments with exit\n"
+#define ERROR_CD "Give excactly one argument with cd\n"
+#define ERROR_OWD "failed to get owd\n"
+#define ERROR_CWD "failed to get cwd\n"
 
 char** tokenize(char* str, char *spacer)
 {
@@ -28,36 +35,42 @@ char** tokenize(char* str, char *spacer)
 }
 //Default build in commands
 int defCmd(char ** arguments){//return 1 if not found and 0 if one found
-    char error_message_arguments_exit[50] = "not able to use given arguments with exit\n";
-    char error_message_arguments_path[50] = "Give excactly one argument with cd\n";
-    char error_message_owd[50] = "failed to get owd\n";
-    char error_message_cwd[50] = "failed to get cwd\n";
+    char str[PATH_MAX] = "PATH=";
+    char ss[2] = ":";
     if(!strcmp(arguments[0], "exit")){
         if(!arguments[1]){
             printf("Exiting wish\n");
             exit(0);}
         else{
-              write(STDERR_FILENO, error_message_arguments_exit, strlen(error_message_arguments_exit));
+              write(STDERR_FILENO, ERROR_EXIT, strlen(ERROR_EXIT));
         }
         return 1;
     }
     else  if(!strcmp(arguments[0], "path")){
-
+        if(arguments[1] == NULL){setenv("PATH", "", 1);}
+        else{
+            for (int i = 1;; i++)
+            {   if(arguments[i] == NULL){break;}
+                putenv(strcat(str, arguments[i]));
+                strcat(str, ss);
+            }
+        }
+        printf("New Path(s) are: %s\n", getenv("PATH"));
         return 1;}
     else  if(!strcmp(arguments[0], "cd")){
         if(!arguments[1] || arguments[2]){
-            write(STDERR_FILENO, error_message_arguments_path, strlen(error_message_arguments_path));
+            write(STDERR_FILENO, ERROR_CD, strlen(ERROR_CD));
         }
         else{
             char owd[PATH_MAX];
             char cwd[PATH_MAX];
             if (getcwd(owd, sizeof(owd))){
                 printf("Old working dir: %s\n", owd);}
-            else{write(STDERR_FILENO, error_message_owd, strlen(error_message_owd));}
+            else{write(STDERR_FILENO, ERROR_OWD, strlen(ERROR_OWD));}
             chdir(arguments[1]);
             if (getcwd(cwd, sizeof(cwd))) {
                 printf("New working dir: %s\n", cwd);}
-            else{write(STDERR_FILENO, error_message_owd, strlen(error_message_owd));}
+            else{write(STDERR_FILENO, ERROR_CWD, strlen(ERROR_CWD));}
         }
         return 1;
     }
@@ -69,7 +82,9 @@ int defCmd(char ** arguments){//return 1 if not found and 0 if one found
         return 0;}
 }
 
+
 int main(int argc, char *argv[]){
+    setenv("PATH", PATH, 1);//Set path to only contain /bin    
     FILE * fpIn;
     char *buffer;
     size_t bufsize = 3;
@@ -111,7 +126,9 @@ int main(int argc, char *argv[]){
                 arguments = tokenize(token, spacer);
                 if(!defCmd(arguments)){
                     if(fork() == 0){
-                        if(-1 == execvp(arguments[0],arguments)){printf("not run\n");exit(0);}}
+                        if(-1 == execvp(arguments[0],arguments)){
+                            printf("not run\n");
+                            exit(0);}}
                 }
             }
             wait(&status);
