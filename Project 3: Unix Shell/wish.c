@@ -13,6 +13,9 @@
 #include<sys/wait.h>
 #include <unistd.h>
 #include <limits.h>
+#include <fcntl.h>
+
+
 #define PATH "/bin"
 
 #define ERROR_ACCESS "Could not access the command.\n"
@@ -20,6 +23,9 @@
 #define ERROR_CD "Give excactly one argument with cd\n"
 #define ERROR_OWD "failed to get owd\n"
 #define ERROR_CWD "failed to get cwd\n"
+#define ERROR_MEMORY "Failed to allocate memory\n"
+#define ERROR_FILE "Failed to open the file\n"
+#define ERROR_EXECV "Failed to run the command\n"
 
 char** tokenize(char* str, char *spacer)
 {
@@ -81,23 +87,41 @@ int defCmd(char ** arguments){//return 1 if not found and 0 if one found
     else{
         return 0;}
 }
+int checkOutput(char ** array){
+    int fd = 0;
+    for (int i = 0;; i++)
+    {
+        if(!array[i]){return fd;}
+        if(strcmp(array[i], ">") == 0){
+            char path[PATH_MAX] = "./";
+            strcat(path, array[i+1]);
+            fd = open(path, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+            array[i] = 0;
+            return fd;
+        }
+    }
+
+}
 
 
 int main(int argc, char *argv[]){
     setenv("PATH", PATH, 1);//Set path to only contain /bin    
-    FILE * fpIn;
+    FILE * fpIn = stdin;
+    FILE * fpOut = stdout;
+    int fdOut;
     char *buffer;
-    size_t bufsize = 3;
+    size_t bufsize = 0;
+    int status;
+    char spacer[2] = " ";
+    
     buffer = (char *)malloc(bufsize * sizeof(char));
-    if( buffer == NULL)
-    {
-        perror("Unable to allocate buffer");
+
+    if(buffer == NULL){
+        write(STDERR_FILENO, ERROR_MEMORY, strlen(ERROR_MEMORY));
         exit(1);
     }
     if(argc == 1){
         fpIn = stdin;
-
-    
     }
     else if(argc == 2){
         fpIn = fopen(argv[1], "r");
@@ -105,15 +129,14 @@ int main(int argc, char *argv[]){
     
         if (!fpIn)
         {
-            fprintf(stderr, "opening file failed. Wish closes.\n");
+            write(STDERR_FILENO, ERROR_FILE, strlen(ERROR_FILE));
      
             exit(1);
         }
     }
     else{exit(1);}
 
-    int status;
-    char spacer[2] = " ";
+    
     if(argc == 1){printf("wish>");}
     //wish loop starts
         while(1){
@@ -126,9 +149,15 @@ int main(int argc, char *argv[]){
                 arguments = tokenize(token, spacer);
                 if(!defCmd(arguments)){
                     if(fork() == 0){
+                        if ((fdOut = checkOutput(arguments))){
+                            dup2(fdOut, STDOUT_FILENO);
+                            dup2(fdOut, STDERR_FILENO);
+                        }
+                        
                         if(-1 == execvp(arguments[0],arguments)){
-                            printf("not run\n");
-                            exit(0);}}
+                            write(STDERR_FILENO, ERROR_EXECV, strlen(ERROR_EXECV));}
+                        close(fdOut);
+                        exit(0);}
                 }
             }
             wait(&status);
