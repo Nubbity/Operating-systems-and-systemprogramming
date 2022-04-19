@@ -10,18 +10,18 @@
 #include <stdio.h>
 #include <string.h>
 
-
+//Reads file and finds all rows where word is used and prints them
 void grepWanted(FILE *fp, char word[300]){
     
     
     char * line = NULL;
     size_t buf = 0;
-    while(getline(&line, &buf, fp) >=0){//Luetaan kunnes EOF
-         if(strstr(line, word)){fprintf(stdout, "%s", line);}//tulostetaan konsoliin jos substring on rivillä
+    while(getline(&line, &buf, fp) >=0){//Read until EOF
+         if(strstr(line, word)){fprintf(stdout, "%s", line);}//if word is used line is printed
     }
     
     free(line);
-    fprintf(stdout, "\n");//erotetaan luetut tiedostot toisistaan
+    fprintf(stdout, "\n");//seperates read rows
 }
 
 int main(int argc, char *argv[]){
@@ -33,11 +33,11 @@ int main(int argc, char *argv[]){
         grepWanted(stdin, argv[1]);
     }
     else{
-    //käydään kaikki tiedostot läpi
+    //goes trough all files
     for (int i = 2; i < argc; i++)
     {   
-        FILE* fp = fopen(argv[i], "r");//Tiedoston avaaminen
-        if(!fp){printf("my-grep: cannot open file\n"); exit(1);}//Jos tiedostoa ei löydy/ei voi avata
+        FILE* fp = fopen(argv[i], "r");//opens file
+        if(!fp){printf("my-grep: cannot open file\n"); exit(1);}//if file cant be opened
         grepWanted(fp, argv[1]);
         fclose(fp);
     }}

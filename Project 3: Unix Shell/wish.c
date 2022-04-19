@@ -133,6 +133,7 @@ int checkAccess(char* argument){
     return 0;
 }
 //main function
+//controlss all commandline arguments and runs the wish loop
 int main(int argc, char *argv[]){
     setenv("PATH", PATH, 1);//Set path to only contain /bin    
     FILE * fpIn = stdin;//standard input

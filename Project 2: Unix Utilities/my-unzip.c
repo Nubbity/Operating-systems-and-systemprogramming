@@ -11,17 +11,18 @@
 #include <stdio.h>
 #include <string.h>
 
+//Uncompresses the file from <count of same char><char>
 void unzipFile(FILE * fpIn, FILE * fpOut){
     int lenght = -1;
     char last = (char) 0;
-    if(!fpIn || !fpOut){printf("my-grep: cannot open file\n"); exit(1);}
+    if(!fpIn || !fpOut){printf("my-unzip: cannot open file\n"); exit(1);}
     while (1)
     {   
         
         if(1 != fread(&lenght, sizeof(int), 1, fpIn)){break;}//Read number
         if(1 != fread(&last, sizeof(char), 1, fpIn)){break;}//Read char
 
-            for (;lenght > 0; lenght--){
+            for (;lenght > 0; lenght--){//print char as many times as number indicates
             fprintf(fpOut, "%c", last);
             }
         
@@ -34,16 +35,16 @@ void unzipFile(FILE * fpIn, FILE * fpOut){
     
 }
 int main(int argc, char *argv[]){
-    if(argc == 1){fprintf(stderr, "my-unzip: file1 [file2 ...]\n");exit(1);}
-    else if (argc == 2)
+    
+    if (argc == 2)
     {
-        unzipFile(fopen(argv[1], "r"), stdout);
+        unzipFile(fopen(argv[1], "r"), stdout);//prints to stdout
     }
     else if (argc == 3){
-        unzipFile(fopen(argv[1], "r"), fopen(argv[2], "w"));
+        unzipFile(fopen(argv[1], "r"), fopen(argv[2], "w"));//prints to seperate file
     }
     else{
-        fprintf(stderr, "my-zip: file1(Input) [file2(Output)]\n");
+        fprintf(stderr, "my-unzip: file1 [file2 ...]\n");exit(1);
     }
     return 0;
 }

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 
+//Zip files to contain <count of following chars><char>
 void zipFile(FILE * fpIn, FILE * fpOut){
     char current = (char)0;
     char last = (char)0;
@@ -17,12 +18,12 @@ void zipFile(FILE * fpIn, FILE * fpOut){
 
     while ((current = fgetc(fpIn))!= EOF)
     {
-        if(current == last){
+        if(current == last){//if same char add to counter
             n++;
         }
         else{
-           fwrite(&n, sizeof(int),1, fpOut);
-           fwrite(&last,sizeof(char),1, fpOut);
+           fwrite(&n, sizeof(int),1, fpOut);//write 4 byte integer to file
+           fwrite(&last,sizeof(char),1, fpOut);//write ascii char to file
            n = 1;
         }
         last = current;
@@ -38,11 +39,11 @@ int main(int argc, char *argv[]){
         zipFile(stdin, fopen(argv[1], "a"));
     }
     else{
-    //käydään kaikki tiedostot läpi
+    //goes trough all files
     for (int i = 2; i < argc; i++)
     {   
-        FILE* fp = fopen(argv[i], "r");//Tiedoston avaaminen
-        if(!fp){printf("my-grep: cannot open file\n"); exit(1);}//Jos tiedostoa ei löydy/ei voi avata
+        FILE* fp = fopen(argv[i], "r");//opens file
+        if(!fp){printf("my-zip: cannot open file\n"); exit(1);}//if file is not found
         zipFile(fp,fopen(argv[1], "a"));
         fclose(fp);
     }}
