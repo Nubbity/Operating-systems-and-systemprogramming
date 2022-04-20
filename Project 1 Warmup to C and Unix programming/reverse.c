@@ -49,12 +49,8 @@ void writeLine(char file[], Lines* lines, FILE* fp){
     int last = 1;//last row will probably not have new line character
     while(1){
         if(rl ==-1){break;}
-        fprintf(fp, "%s", text[rl]);
-        if(last){
-            fprintf(fp, "\n");
-            last = 0;
-        }
-
+        text[rl][strcspn(text[rl], "\n")] = 0;//removes new line from the row
+        fprintf(fp, "%s\n", text[rl]);
         rl--;
     
     }
